@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>64강 공룡&동물 월드컵</title>
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-color: #ffffff;
+            --accent-color: #ff6b6b; /* VS 색상 */
+            --winner-color: #4facfe; /* 우승자 색상 */
+        }
+
+        body {
+            font-family: 'Do Hyeon', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* 스크롤 방지 */
+            user-select: none; /* 글자 선택 방지 */
+        }
+
+        /* 상단 정보 패널 */
+        .info-panel {
+            background-color: var(--card-color);
+            padding: 15px 40px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* 메인 대결 컨테이너 */
+        .worldcup-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            width: 90%;
+            max-width: 1000px;
+        }
+
+        /* [핵심 수정] 마우스 클릭이 무조건 쏙쏙 빨아들이도록 카드 설정 */
+        .animal-card {
+            flex: 1;
+            background-color: var(--card-color);
+            border-radius: 30px;
+            padding: 40px 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 5px solid var(--card-color); /* 기본 테두리 */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative; /* z-index를 위해 */
+            z-index: 10;
+        }
+
+        /* 마우스 올렸을 때 효과 */
+        .animal-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            border-color: #ff9a9e; /* hover 시 테두리 색상 변동 */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        /* 이모지(사진) 설정 */
+        .animal-emoji {
+            font-size: 10rem;
+            margin-bottom: 20px;
+            pointer-events: none; /* [핵심] 이모지가 클릭을 방해하지 못하게 함 */
+        }
+
+        /* 동물/공룡 이름 설정 */
+        .animal-name {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #333;
+            pointer-events: none; /* [핵심] 이름이 클릭을 방해하지 못하게 함 */
+        }
+
+        /* 중간 VS 표시 */
+        .vs-badge {
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 2.5rem;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+            z-index: 5;
+        }
+
+        /* 우승 화면 (처음엔 숨김) */
+        #winner-screen {
+            display: none;
+            text-align: center;
+        }
+
+        #winner-screen h2 {
+            font-size: 4rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #winner-screen .winner-emoji {
+            font-size: 15rem;
+            margin: 20px 0;
+            animation: winnerBounce 1s infinite;
+        }
+
+        #winner-screen .animal-name {
+            color: var(--winner-color);
+            font-size: 4.5rem;
+        }
+
+        /* 다시하기 버튼 */
+        button {
+            font-family: 'Do Hyeon', sans-serif;
+            background-color: #2ed573;
+            color: white;
+            font-size: 2.3rem;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(46,213,115,0.4);
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #26af61;
+            transform: scale(1.05);
+        }
+
+        /* 우승자 이모지 두근두근 애니메이션 */
+        @keyframes winnerBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-screen">
+        <div class="info-panel">
+            <span id="round-name" style="color: var(--accent-color); font-weight: bold;">64강</span>
+            <span id="match-status" style="color: #666; margin-left: 10px;">(1/32)</span>
+        </div>
+
+        <div class="worldcup-container">
+            <div class="animal-card" onclick="selectAnimal(0)">
+                <div class="animal-emoji" id="emoji-0">🐶</div>
+                <div class="animal-name" id="name-0">강아지</div>
+            </div>
+
+            <div class="vs-badge">VS</div>
+
+            <div class="animal-card" onclick="selectAnimal(1)">
+                <div class="animal-emoji" id="emoji-1">🐱</div>
+                <div class="animal-name" id="name-1">고양이</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="winner-screen">
+        <h2>🏆 최종 우승 🏆</h2>
+        <div class="winner-emoji" id="winner-emoji">👑</div>
+        <div class="animal-name" id="winner-name">강아지</div>
+        <button onclick="restartGame()">처음부터 다시하기</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // [필독] 공룡까지 총출동한 완벽 매칭 64마리 동물 명단!
+        const animalData = [
+            { name: "강아지", emoji: "🐶" }, { name: "고양이", emoji: "🐱" },
+            { name: "토끼", emoji: "🐰" }, { name: "여우", emoji: "🦊" },
+            { name: "사자", emoji: "🦁" }, { name: "호랑이", emoji: "🐯" },
+            { name: "판다", emoji: "🐼" }, { name: "코알라", emoji: "🐨" },
+            { name: "곰", emoji: "🐻" }, { name: "햄스터", emoji: "🐹" },
+            { name: "원숭이", emoji: "🐵" }, { name: "개구리", emoji: "🐸" },
+            { name: "돼지", emoji: "🐷" }, { name: "병아리", emoji: "🐥" },
+            { name: "펭귄", emoji: "🐧" }, { name: "코끼리", emoji: "🐘" },
+            { name: "쥐", emoji: "🐭" }, { name: "소", emoji: "🐮" },
+            { name: "뱀", emoji: "🐍" }, { name: "말", emoji: "🐴" },
+            { name: "양", emoji: "🐑" }, { name: "닭", emoji: "🐔" },
+            { name: "늑대", emoji: "🐺" }, { name: "오소리", emoji: "🦡" },
+            { name: "수달", emoji: "🦦" }, { name: "고래", emoji: "🐳" },
+            { name: "돌고래", emoji: "🐬" }, { name: "거북이", emoji: "🐢" },
+            { name: "부엉이", emoji: "🦉" }, { name: "사슴", emoji: "🦌" },
+            { name: "다람쥐", emoji: "🐿️" }, { name: "물개", emoji: "🦭" },
+            // 새로운 32마리 추가 (공룡 대거 합류!)
+            { name: "티라노사우루스", emoji: "🦖" }, { name: "트리케라톱스", emoji: "🦕" },
+            { name: "브라키오사우루스", emoji: "🦕" }, { name: "스테고사우루스", emoji: "🦖" },
+            { name: "프테라노돈", emoji: "🦅" }, { name: "벨로키라프토르", emoji: "🦎" },
+            { name: "맘모스", emoji: "🐘" }, { name: "상어", emoji: "🦈" },
+            { name: "범고래", emoji: "🐋" }, { name: "하마", emoji: "🦛" },
+            { name: "코뿔소", emoji: "🦏" }, { name: "기린", emoji: "🦒" },
+            { name: "얼룩말", emoji: "🦓" }, { name: "캥거루", emoji: "🦘" },
+            { name: "나무늘보", emoji: "🦥" }, { name: "유니콘", emoji: "🦄" },
+            { name: "고릴라", emoji: "🦍" }, { name: "문어", emoji: "🐙" },
+            { name: "오징어", emoji: "🦑" }, { name: "바다거북", emoji: "🐢" },
+            { name: "복어", emoji: "🐡" }, { name: "금붕어", emoji: "🐟" },
+            { name: "독수리", emoji: "🦅" }, { name: "올빼미", emoji: "🦉" },
+            { name: "플라밍고", emoji: "🦩" }, { name: "오리", emoji: "🦆" },
+            { name: "나비", emoji: "🦋" }, { name: "꿀벌", emoji: "🐝" },
+            { name: "무당벌레", emoji: "🐞" }, { name: "전갈", emoji: "🦂" },
+            { name: "달팽이", emoji: "🐌" }, { name: "개미", emoji: "🐜" }
+        ];
+
+        let currentRound = [];
+        let nextRound = [];
+        let matchIndex = 0;
+
+        function initGame() {
+            matchIndex = 0;
+            nextRound = [];
+            // 모든 동물/공룡 데이터를 완벽하게 셔플
+            currentRound = [...animalData].sort(() => Math.random() - 0.5);
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            let totalMatch = currentRound.length / 2;
+            let roundName = currentRound.length + "강";
+            
+            if (currentRound.length === 2) {
+                roundName = "결승전";
+            } else if (currentRound.length === 4) {
+                roundName = "4강";
+            } else if (currentRound.length === 8) {
+                roundName = "8강";
+            } else if (currentRound.length === 16) {
+                roundName = "16강";
+            }
+
+            document.getElementById('round-name').innerText = roundName;
+            document.getElementById('match-status').innerText = "(" + (matchIndex + 1) + "/" + totalMatch + ")";
+
+            // 현재 순서에 맞는 동물 객체 꺼내기
+            const leftAnimal = currentRound[matchIndex * 2];
+            const rightAnimal = currentRound[matchIndex * 2 + 1];
+
+            // 화면 테두리 색상 리셋 (hover 효과 초기화)
+            const cards = document.querySelectorAll('.animal-card');
+            cards.forEach(card => card.style.borderColor = "var(--card-color)");
+
+            // 화면 표기 업데이트
+            document.getElementById('emoji-0').innerText = leftAnimal.emoji;
+            document.getElementById('name-0').innerText = leftAnimal.name;
+            document.getElementById('emoji-1').innerText = rightAnimal.emoji;
+            document.getElementById('name-1').innerText = rightAnimal.name;
+        }
+
+        function selectAnimal(sideIndex) {
+            // 선택된 동물을 안전하게 복사해서 다음 라운드 리스트에 추가
+            const selected = { ...currentRound[matchIndex * 2 + sideIndex] };
+            nextRound.push(selected);
+            
+            matchIndex++;
+
+            if (matchIndex * 2 >= currentRound.length) {
+                if (nextRound.length === 1) {
+                    // 최종 우승!
+                    showWinner(nextRound[0]);
+                } else {
+                    // 다음 라운드(32강, 16강 등)로 교체 및 초기화
+                    currentRound = [...nextRound];
+                    nextRound = [];
+                    matchIndex = 0;
+                    updateDisplay();
+                }
+            } else {
+                updateDisplay();
+            }
+        }
+
+        function showWinner(winner) {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('winner-screen').style.display = 'block';
+            document.getElementById('winner-emoji').innerText = winner.emoji;
+            document.getElementById('winner-name').innerText = winner.name;
+            
+            // 팡팡 터지는 꽃가루 효과!
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // [무한 플레이 핵심] 지저분한 캐시까지 싹 날리고 무조건 완전 새 게임 상태로 돌려놓는 버튼!
+        function restartGame() {
+            window.location.reload();
+        }
+
+        // 게임 자동 시작
+        initGame();
+    </script>
+</body>
+</html>
